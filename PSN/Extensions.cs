@@ -293,6 +293,25 @@ namespace PSN.Extensions
             }
             return result;
         }
+        /// <summary>
+        /// Содержатся ли в записи искомый столбец
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="column_name">Наимненование проверяемого столбца</param>
+        /// <returns></returns>
+        public static bool ContainsColumn(this System.Data.IDataRecord self, string column_name)
+        {
+            bool result = false;
+            for (int i = 0; i < self.FieldCount; i++)
+            {
+                if (self.GetName(i).Equals(column_name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+        }
         #endregion Данные
 
         #region Исключения
@@ -456,7 +475,39 @@ namespace PSN.Extensions
         public static bool IsAnyOf<T>(this T self, params T[] collection)
         {
             return collection.Contains(self);
-        }        
+        }
+        /// <summary>
+        /// Проверка наличия в строке любой из подстрок из перечисляемых
+        /// </summary>
+        /// <param name="self"></param>
+        /// <param name="keywords">Искомые подстроки</param>
+        /// <param name="comparison_type">Тип сравнения</param>
+        /// <returns>Истина - в строке содержится хоть одна подстрока</returns>
+        public static bool ContainsAny(this string self, IEnumerable<string> keywords, StringComparison comparison_type = StringComparison.CurrentCulture)
+        {
+            return keywords.Any(p => self.IndexOf(p, comparison_type) >= 0);
+        }
+        /// <summary>
+        /// Слияние данных в словарях
+        /// </summary>
+        /// <typeparam name="T">Тип списка-значения</typeparam>
+        /// <typeparam name="U">Тип ключа словарей</typeparam>
+        /// <param name="self">Словарь-приёмник</param>
+        /// <param name="new_data">Словарь-источник</param>
+        public static void MergeWith<T, U>(this Dictionary<U, List<T>> self, Dictionary<U, List<T>> new_data)
+        {
+            foreach (U key in new_data.Keys.ToArray())
+            {
+                if (new_data[key] != null && new_data[key].Count > 0)
+                {
+                    if (!self.ContainsKey(key))
+                    {
+                        self.Add(key, new List<T>());
+                    }
+                    self[key].AddRange(new_data[key].ToArray());
+                }
+            }
+        }
         #endregion
     }
 }

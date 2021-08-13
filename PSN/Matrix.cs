@@ -88,7 +88,7 @@ namespace PSN.Matrix
             // в диапазоне строк, вычисленном на первом шаге.
             for (int i = row; i <= rows_ubound; i++)
             {
-                if (!_data[i, column].Equals(prev_value))
+                if ((_data[i,column] != null && !_data[i, column].Equals(prev_value)) || (_data[i,column] == null && prev_value != null))
                 {
                     break;
                 }
@@ -102,7 +102,7 @@ namespace PSN.Matrix
 
                 for (int i = row; i <= last_cell.Row; i++)
                 {
-                    if (!_data[i, j].Equals(prev_value))
+                    if ((_data[i, j] != null && !_data[i, j].Equals(prev_value)) || (_data[i, j] == null && prev_value != null))
                     {
                         break;
                     }
@@ -120,7 +120,7 @@ namespace PSN.Matrix
                 }
             }
 
-            return new Block(first_cell, last_cell);
+            return new Block(first_cell, last_cell) { BlockValue = _data[row, column] };
         }
 
         #region Вспомогательные классы
